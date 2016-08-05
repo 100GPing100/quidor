@@ -1,62 +1,52 @@
+//
+// Created by Super on 05/08/2016.
+//
+
 #ifndef QUIDOR_OBJECT_H
 #define QUIDOR_OBJECT_H
+
+
+// std
+#include <memory>
 
 // quidor
 #include "Type.h"
 
+
 #define ObjectMeta(class, parent) \
-	public: \
-		static quidor::Type * classtype() { \
-			static quidor::Type type = quidor::Type(#class, parent::classtype()); \
-			return &type; \
-		} \
-		\
-		virtual quidor::Type * type() const { \
-			return class::classtype(); \
-		} \
-	private:
-// ObjectMeta
+    public: \
+        static const quidor::Type * classType() { \
+            static quidor::Type type (#class, parent::classType()); \
+            return &type; \
+        } \
+        \
+        virtual const quidor::Type * getClassType() const { \
+            return class::classType(); \
+        } \
+    private:
+//ObjectMeta(class, parent)
 
-namespace quidor
-{
+namespace quidor {
+    class Object {
+    public:
+        static const Type * classType() {
+            // owned here, comparable by pointer comparison (const Type * A == const Type * B)
+            static Type type ("quidor::Object", nullptr);
+            return &type;
+        }
 
-class Object
-{
-public:
-	static Type * classtype() {
-		static Type type = Type("quidor::Object", nullptr);
-		return &type;
-	}
+        virtual const Type * getClassType() const {
+            return quidor::Object::classType();
+        }
 
-	virtual Type * type() const {
-		return Object::classtype();
-	}
+        virtual std::string toString() const {
+            return this->getClassType()->getName();
+        }
 
-	virtual const char * tostring() const {
-		return this->type()->name();
-	}
+        Object() = default;
+        virtual ~Object() = default;
+    };
+}
 
-	bool isParentOf(const Object & o) const {
-		return type()->isParentOf(o.type());
-	}
 
-	bool isChildOf(const Object & o) const {
-		return type()->isChildOf(o.type());
-	}
-
-	template<class T>
-	T * cast() {
-		if (T::classtype()->isParentOf(this->type())) {
-			return (T *) this;
-		}
-		
-		return nullptr;
-	}
-
-	Object() { }
-	virtual ~Object() { }
-}; // Object
-
-} // quidor
-
-#endif // QUIDOR_OBJECT_H
+#endif //QUIDOR_OBJECT_H

@@ -58,6 +58,7 @@
 namespace quidor
 {
 
+[[deprecated("Outdated and possible removal in the future")]]
 template<class owner, typename T>
 class Property final
 {
